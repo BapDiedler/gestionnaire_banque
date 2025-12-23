@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "crypto-js": "^4.2.0",
+    "jsonwebtoken": "^9.0.3",
+    "react-csv": "^2.2.2",
+    "recharts": "^2.6.2"
+  }
+}

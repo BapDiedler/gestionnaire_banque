@@ -1,0 +1,123 @@
+body {
+  margin:0;
+  font-family:'Inter',sans-serif;
+  background:#f7f8fc;
+  color:#1f2937;
+}
+
+.app-container {
+  max-width:900px;
+  margin:0 auto;
+  padding:40px 20px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.app-container.dark {
+  background:#1f2937;
+  color:#f3f4f6;
+}
+
+.title {
+  text-align:center;
+  font-size:2.5rem;
+  font-weight:700;
+  margin-bottom:30px;
+  color:#4f46e5;
+}
+
+.button-group {
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  margin-bottom:30px;
+}
+
+.btn {
+  padding:12px 25px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-primary { background-color:#4f46e5; color:#fff; }
+.btn-primary:hover { background-color:#6366f1; }
+.btn-secondary { background-color:#e5e7eb; color:#1f2937; }
+.btn-secondary:hover { background-color:#d1d5db; }
+
+.chart-filters {
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:20px;
+}
+.chart-filters select,
+.chart-filters input {
+  padding:5px 10px;
+  border-radius:6px;
+  border:1px solid #d1d5db;
+  font-size:14px;
+}
+
+.dashboard-summary {
+  display:flex;
+  justify-content:space-around;
+  flex-wrap:wrap;
+  gap:20px;
+  margin-bottom:20px;
+  font-weight:bold;
+}
+
+.transactions-list {
+  display:grid;
+  gap:10px;
+  margin-bottom:40px;
+}
+
+.transaction-card {
+  display:flex;
+  flex-direction:column;
+  padding:15px 20px;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s;
+  cursor:pointer;
+}
+
+.transaction-card.expanded { background:#f0f4ff; transform:translateY(-2px); }
+
+.transaction-summary.positive { color:#10b981; font-weight:600; }
+.transaction-summary.negative { color:#ef4444; font-weight:600; }
+
+.transaction-details-inline {
+  margin-top:8px;
+  font-size:14px;
+  color:#555;
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.transaction-card.expanded .transaction-details-inline {
+  max-height:200px;
+  opacity:1;
+}
+
+.chart-wrapper {
+  width:100%;
+  height:350px;
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+  margin-bottom:50px;
+  transition: background 0.3s;
+}
+
+.app-container.dark .chart-wrapper {
+  background:#374151;
+  color:#f3f4f6;
+}
