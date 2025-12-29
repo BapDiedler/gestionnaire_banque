@@ -8,9 +8,16 @@ const MOCK_MODE = process.env.REACT_APP_MOCK_MODE === 'true';
 
 const COLORS = ['#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f', '#edc949'];
 
+const BUDGETS = {
+  Food: 300,
+  Transport: 150,
+  Entertainment: 100,
+};
+
+
 function App() {
   const [linkToken, setLinkToken] = useState(null);
-  const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken') || null);
+  const [jwt, setJwt] = useState(localStorage.getItem("jwt"));
   const [transactions, setTransactions] = useState([]);
   const [expandedTx, setExpandedTx] = useState(null);
   const [filterMonth, setFilterMonth] = useState('all');
@@ -22,13 +29,13 @@ function App() {
 
   // Plaid link token
   useEffect(() => {
-  if (!MOCK_MODE) {
-    fetch('http://localhost:3001/api/create_link_token', { method: 'POST' })
-      .then(res => res.json())
-      .then(data => setLinkToken(data.link_token))
-      .catch(err => console.error('Erreur link token:', err));
-  }
-}, []); // Se déclenche seulement au premier rendu
+    if (!MOCK_MODE) {
+      fetch('http://localhost:3001/api/create_link_token', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => setLinkToken(data.link_token))
+        .catch(err => console.error('Erreur link token:', err));
+    }
+  }, []); // Se déclenche seulement au premier rendu
 
 
   const { open, ready } = usePlaidLink({
@@ -43,13 +50,13 @@ function App() {
 
       // On reçoit maintenant uniquement un JWT sécurisé
       localStorage.setItem("jwt", data.jwt); // Stockage côté frontend
-      setAccessToken(data.jwt); // On l’utilise pour les requêtes
+      setJwt(data.jwt); // On l’utilise pour les requêtes
     },
   });
 
 
   const logout = () => {
-    setAccessToken(null);
+    setJwt(null);
     setTransactions([]);
     localStorage.removeItem('jwt');
   };
@@ -92,6 +99,15 @@ function App() {
     return true;
   });
 
+  const budgetStatus = Object.entries(BUDGETS).map(([cat, limit]) => {
+    const spent = filteredTransactions
+      .filter(tx => tx.category?.includes(cat))
+      .reduce((s, tx) => s + Math.abs(tx.amount), 0);
+
+    return { cat, spent, limit };
+  });
+
+
   // Dashboard summary
   const totalExpenses = filteredTransactions.filter(tx => tx.amount < 0).reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
   const totalIncome = filteredTransactions.filter(tx => tx.amount > 0).reduce((sum, tx) => sum + tx.amount, 0);
@@ -123,15 +139,15 @@ function App() {
       <h1 className="title">Assistant Financier</h1>
 
       <div className="button-group">
-        {!accessToken &&
+        {!jwt &&
           <button className="btn btn-primary"
             disabled={!ready && !MOCK_MODE}
-            onClick={() => { if (MOCK_MODE) { setAccessToken('mock-access-token'); localStorage.setItem('accessToken', 'mock-access-token') } else if (ready) open(); }}
+            onClick={() => { if (MOCK_MODE) { setJwt('mock-access-token'); localStorage.setItem('jwt', 'mock-access-token') } else if (ready) open(); }}
           >
             Connecter ma banque
           </button>
         }
-        {accessToken &&
+        {jwt &&
           <>
             <button className="btn btn-secondary" onClick={loadTransactions}>Voir mes transactions</button>
             <button className="btn btn-secondary" onClick={logout}>Déconnexion</button>
@@ -142,7 +158,7 @@ function App() {
         </button>
       </div>
 
-      {accessToken && transactions.length > 0 && (
+      {jwt && transactions.length > 0 && (
         <>
           {/* Filtres */}
           <div className="chart-filters">
@@ -165,6 +181,14 @@ function App() {
             <div>Dépenses: {totalExpenses.toFixed(2)}€</div>
             <div>Revenus: {totalIncome.toFixed(2)}€</div>
             <CSVLink data={filteredTransactions} filename="transactions.csv" className="btn btn-secondary">Exporter CSV</CSVLink>
+          </div>
+
+          <div className="budget-box">
+            {budgetStatus.map(b => (
+              <div key={b.cat} className={b.spent > b.limit ? 'over' : ''}>
+                {b.cat}: {b.spent.toFixed(2)}€ / {b.limit}€
+              </div>
+            ))}
           </div>
 
           {/* Transactions */}

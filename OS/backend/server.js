@@ -96,6 +96,8 @@ app.post("/api/exchange_public_token", async (req, res) => {
 const { decrypt } = require("./utils/crypto");
 const auth = require("./middleware/auth");
 
+
+
 app.get("/api/transactions", auth, async (req, res) => {
   if (MOCK_MODE) {
     return res.json([
